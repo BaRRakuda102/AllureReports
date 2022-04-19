@@ -1,37 +1,47 @@
-package Allure_Reports;
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.WebDriverRunner;
+import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
+import static org.openqa.selenium.By.linkText;
+import static org.openqa.selenium.By.partialLinkText;
 
 public class WebSteps {
-    @Step("Open new page")
-    public void openMainPage(){
+    @Step("Открываем главную страницу")
+    public void openMainPage() {
         open("https://github.com");
     }
 
-    @Step("Search for a repository {repo}")
-    public void searchForRepository(String repo){
+    @Step("Ищем реопзиторий {repo}")
+    public void searchForRepository(String repo) {
         $(".header-search-input").click();
         $(".header-search-input").sendKeys(repo);
         $(".header-search-input").submit();
     }
 
-    @Step("Open the repository {repo}")
-    public void openRepository(String repo){
-        $(By.linkText(repo)).click();
+    @Step("Переходим по ссылке репозитория {repo}")
+    public void clickOnRepositoryLink(String repo) {
+        $(linkText(repo)).click();
     }
 
-    @Step("Go to tab Issue")
-    public void openIssueTab(){
-        $(By.partialLinkText("Issues")).click();
+    @Step("Кликаем на таб Issues")
+    public void openIssuesTab() {
+        $(partialLinkText("Issues")).click();
     }
 
-    @Step("Checking for tabs Issue {num}")
-    public void shouldSeeIssueWithNumber(int num){
-        $(withText("#1")).should(Condition.exist);
+    @Step("Проверяем что существует Issue с номером {number}")
+    public void shouldSeeIssueWithNumber(int number) {
+        $(withText("#" + number)).should(Condition.visible);
+        attachScreenshot();
     }
 
+    @Attachment(value = "Скриншот репозитория git", type = "image/png", fileExtension = "png")
+    public byte[] attachScreenshot() {
+        return ((TakesScreenshot) WebDriverRunner.getWebDriver()).getScreenshotAs(OutputType.BYTES);
+    }
 }
